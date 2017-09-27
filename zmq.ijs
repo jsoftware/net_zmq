@@ -46,7 +46,20 @@ ZMQ_POLLERR=: 4
 3 : 0''
 if. _1=nc<'ctx' do. ctx=: 0 [ sockets=: '' end.
 select. UNAME
-case. 'Linux' do. lib=: 'libzmq.so'
+case. 'Linux' do.
+NB. zmq version depends on distro
+  lib=: 'libzmq.so.5'      NB. stretch
+  if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
+    lib=: 'libzmq.so.3'    NB. jessie
+    if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
+      lib=: 'libzmq.so.1'  NB. wheezy
+      if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
+        m=. 'zmq shared library not at:',LF,'   ','libzmq.so.?',LF
+        m=. m,'verify zmq installed',LF,LF
+        m assert 0
+      end.
+    end.
+  end.
 case. 'Win' do.
   lib=: fread'~home/zmqdllpath.txt'
   if. lib=_1 do.
