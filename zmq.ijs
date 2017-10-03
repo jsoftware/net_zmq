@@ -38,6 +38,7 @@ ZMQ_DONTWAIT=: 1
 ZMQ_SNDMORE=: 2
 
 ZMQ_RCVMORE=: 13
+ZMQ_LINGER=:  17
 
 ZMQ_POLLIN=: 1
 ZMQ_POLLOUT=: 2
@@ -46,20 +47,7 @@ ZMQ_POLLERR=: 4
 3 : 0''
 if. _1=nc<'ctx' do. ctx=: 0 [ sockets=: '' end.
 select. UNAME
-case. 'Linux' do.
-NB. zmq version depends on distro
-  lib=: 'libzmq.so.5'      NB. stretch
-  if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
-    lib=: 'libzmq.so.3'    NB. jessie
-    if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
-      lib=: 'libzmq.so.1'  NB. wheezy
-      if. -. (2 0-:(lib,' dummy > n')&cd ::cder) '' do.
-        m=. 'zmq shared library not at:',LF,'   ','libzmq.so.?',LF
-        m=. m,'verify zmq installed',LF,LF
-        m assert 0
-      end.
-    end.
-  end.
+case. 'Linux' do. lib=: 'libzmq.so'
 case. 'Win' do.
   lib=: fread'~home/zmqdllpath.txt'
   if. lib=_1 do.
@@ -134,8 +122,16 @@ close=: 3 : 0
 sockets_jzmq_=: sockets_jzmq_-.y
 )
 
+NB. hardwired for int options
 getsockopt=: 3 : 0
+echo y,(,2);,4
 >3{r=. 'zmq_getsockopt i x i *i *x'cdxnm y,(,2);,4
+)
+
+
+NB. hardwired for int options
+setsockopt=: 3 : 0
+i.0 0['zmq_setsockopt i x i *i x'cdxnm ((2{.y),<,>{:y),<4
 )
 
 NB. bind socket;'tcp://*:5555'
