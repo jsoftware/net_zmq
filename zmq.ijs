@@ -124,10 +124,8 @@ sockets_jzmq_=: sockets_jzmq_-.y
 
 NB. hardwired for int options
 getsockopt=: 3 : 0
-echo y,(,2);,4
 >3{r=. 'zmq_getsockopt i x i *i *x'cdxnm y,(,2);,4
 )
-
 
 NB. hardwired for int options
 setsockopt=: 3 : 0
