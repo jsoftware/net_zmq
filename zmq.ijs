@@ -156,6 +156,7 @@ NB. returns readable;writeable;error
 NB. unix and windows pollitem structure differ
 NB.  unix fd is 32 bits and windows SOCKET is 64 bits
 NB.  unix structure is 16 bytes windows structure is 24 (rounded up)
+NB. result is return_code;reads;writes;errors
 poll=: 3 : 0
 't e s'=: y
 'events must be empty string'assert ''-:e
@@ -169,8 +170,9 @@ for_i. i.#s do.
   S__c memw (a+i*size),0,1,4
   (7{a.)memw (12+off+a+i*size),0,1
 end.
-'zmq_poll i * i x'cdxnm (<a);(#s);t
+q=. 'zmq_poll > i * i x'cdxnm (<a);(#s);t
+if. _1=q do. q=. q;strerror'' else. q=. q;'' end.
 r=. a.i.(14+off){"1 (size,~#s)$memr a,0,b
 memf a
-<@#&s "1 |. |:2 2 2 #:r
+q,<@#&s "1 |. |:2 2 2 #:r
 )
