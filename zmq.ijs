@@ -69,6 +69,16 @@ lzmqe_jzmq_=: strerror''
 ('zmq error (',lzmqe,')') assert 0
 )
 
+check=: 3 : 0
+if. y do. return. end.
+
+a=. lzmqc
+lzmqe_jzmq_=: strerror''
+log_jcs_ 'zmq: ',(":2!:6''),'  ',a,'  ',lzmqe
+
+('zmq error (',lzmqe,')') assert 0
+)
+
 cdx=: 4 : 0
 lzmqc_jzmq_=: (x i.' '){.x
 lzmqe_jzmq_=: ''
