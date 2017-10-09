@@ -14,6 +14,10 @@ message to server   - option access
 message from server - option error
 )
 
+lzmqc=: lzmqe=: ''
+
+1!:5 :: [ <jpath'~temp/zmq'
+
 localhost=: '127.0.0.1'
 
 NB. /usr/include/zmq.h
@@ -66,17 +70,8 @@ end.
 check=: 3 : 0
 if. y do. return. end.
 lzmqe_jzmq_=: strerror''
-('zmq error (',lzmqe,')') assert 0
-)
-
-check=: 3 : 0
-if. y do. return. end.
-
-a=. lzmqc
-lzmqe_jzmq_=: strerror''
-log_jcs_ 'zmq: ',(":2!:6''),'  ',a,'  ',lzmqe
-
-('zmq error (',lzmqe,')') assert 0
+'zmq-check'zmqlog''
+('zmq-check ',lzmqc,' ',lzmqe) assert 0
 )
 
 cdx=: 4 : 0
@@ -87,7 +82,8 @@ lzmqe_jzmq_=: ''
 
 cdxnm=: 4 : 'r[check _1~:>{.r=. x cdx y'
 cdxnz=: 4 : 'r[check 0~: >{.r=. x cdx y'
-cdxz=: 4 : 'r[check 0=  >{.r=. x cdx y'
+cdxz=:  4 : 'r[check 0=  >{.r=. x cdx y'
+cde=:   4 : '(lib,'' '',x)cd y'
 
 version=: 3 : 0
 try.
@@ -101,7 +97,7 @@ v
 )
 
 strerror=: 3 : 0
-memr 0 _1,~'zmq_strerror >x i'cdx 'zmq_errno > i'cdx''
+memr 0 _1,~'zmq_strerror >x i'cde 'zmq_errno > i'cde''
 )
 
 NB. create ctx if it doesn't already exist
@@ -185,4 +181,35 @@ if. _1=q do. q=. q;strerror'' else. q=. q;'' end.
 r=. a.i.(14+off){"1 (size,~#s)$memr a,0,b
 memf a
 q,<@#&s "1 |. |:2 2 2 #:r
+)
+
+zmqlogfile=: '~temp/zmq/',(":2!:6''),'.log'
+
+NB. write log record to ~temp/zmq/pid.txt
+NB. multiple zmq server tasks need their own pid log file to avoid write races
+NB. log for zmq calls
+zmqlog=: 4 : 0
+(LF,~(18":6!:9''),'  ',(10{.x),'  ',(8":2!:6''),'  ',lzmqc,'  ',lzmqe,'  ',":y) fappend zmqlogfile
+)
+
+NB. log for non zmq calls
+zmqlogx=: 4 : 0
+(LF,~(18":6!:9''),'  ',(10{.x),'  ',(8":2!:6''),'  ',":y) fappend zmqlogfile
+)
+
+zmqlogread=: 3 : 'fread zmqlogfile'
+
+zmqlogclear=: 3 : 0
+ferase zmqlogfile
+i.0 0
+)
+
+zmqlogclearall=: 3 : 0
+ferase 1 dir'~temp/zmq/*.log'
+i.0 0
+)
+
+zmqloglog=: 3 : 0
+(;fread each 1 dir '~temp/zmq/*.log')fwrite '~temp/zmq/log.log'
+'~temp/zmq/log.log'
 )
