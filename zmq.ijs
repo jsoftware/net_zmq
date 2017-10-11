@@ -156,7 +156,7 @@ send=: 3 : 0
 r=. 'zmq_send > i x *c x i'cdxnm y
 )
 
-NB. locales ; '' to for all events ; timeout
+NB. timeout ; '' to for all events ; locales
 NB. int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
 NB. returns readable;writeable;error
 NB. unix and windows pollitem structure differ
@@ -177,10 +177,9 @@ for_i. i.#s do.
   (7{a.)memw (12+off+a+i*size),0,1
 end.
 q=. 'zmq_poll > i * i x'cdxnm (<a);(#s);t
-if. _1=q do. q=. q;strerror'' else. q=. q;'' end.
 r=. a.i.(14+off){"1 (size,~#s)$memr a,0,b
 memf a
-q,<@#&s "1 |. |:2 2 2 #:r
+q;<@#&s "1 |. |:2 2 2 #:r
 )
 
 zmqlogfile=: '~temp/zmq/',(":2!:6''),'.log'

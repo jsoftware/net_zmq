@@ -8,7 +8,7 @@ This is a J interface to ZeroMQ distributed messaging, http://zeromq.org.
 Client/server examples and labs are in ~addons/net/jcs
 )
 
-VERSION=: '1.0.6'
+VERSION=: '1.0.7'
 
 RELEASE=: 'j806'
 
