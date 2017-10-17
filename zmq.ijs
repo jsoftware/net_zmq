@@ -16,8 +16,6 @@ message from server - option error
 
 lzmqc=: lzmqe=: ''
 
-1!:5 :: [ <jpath'~temp/zmq'
-
 localhost=: '127.0.0.1'
 
 NB. /usr/include/zmq.h
@@ -70,7 +68,7 @@ end.
 check=: 3 : 0
 if. y do. return. end.
 lzmqe_jzmq_=: strerror''
-'zmq-check'zmqlog''
+'zmq-check'log''
 ('zmq-check ',lzmqc,' ',lzmqe) assert 0
 )
 
@@ -164,7 +162,7 @@ NB.  unix fd is 32 bits and windows SOCKET is 64 bits
 NB.  unix structure is 16 bytes windows structure is 24 (rounded up)
 NB. result is return_code;reads;writes;errors
 poll=: 3 : 0
-'t e s'=: y
+'t e s'=. y
 'events must be empty string'assert ''-:e
 size=. IFWIN{16 24
 off=. IFWIN{ 0 4
@@ -182,33 +180,34 @@ memf a
 q;<@#&s "1 |. |:2 2 2 #:r
 )
 
-zmqlogfile=: '~temp/zmq/',(":2!:6''),'.log'
+1!:5 :: [ <jpath'~temp/zmq'
+logfile=: '~temp/zmq/',(":2!:6''),'.log'
 
 NB. write log record to ~temp/zmq/pid.txt
 NB. multiple zmq server tasks need their own pid log file to avoid write races
 NB. log for zmq calls
-zmqlog=: 4 : 0
-(LF,~(18":6!:9''),'  ',(10{.x),'  ',(8":2!:6''),'  ',lzmqc,'  ',lzmqe,'  ',":y) fappend zmqlogfile
+log=: 4 : 0
+(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',lzmqc,'  ',lzmqe,'  ',":y) fappend zmqlogfile
 )
 
 NB. log for non zmq calls
-zmqlogx=: 4 : 0
-(LF,~(18":6!:9''),'  ',(10{.x),'  ',(8":2!:6''),'  ',":y) fappend zmqlogfile
+logx=: 4 : 0
+(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',":y) fappend zmqlogfile
 )
 
-zmqlogread=: 3 : 'fread zmqlogfile'
+logread=: 3 : 'fread zmqlogfile'
 
-zmqlogclear=: 3 : 0
+logclear=: 3 : 0
 ferase zmqlogfile
 i.0 0
 )
 
-zmqlogclearall=: 3 : 0
+logclearall=: 3 : 0
 ferase 1 dir'~temp/zmq/*.log'
 i.0 0
 )
 
-zmqloglog=: 3 : 0
+loglog=: 3 : 0
 (;fread each 1 dir '~temp/zmq/*.log')fwrite '~temp/zmq/log.log'
 '~temp/zmq/log.log'
 )
