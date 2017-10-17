@@ -187,18 +187,18 @@ NB. write log record to ~temp/zmq/pid.txt
 NB. multiple zmq server tasks need their own pid log file to avoid write races
 NB. log for zmq calls
 log=: 4 : 0
-(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',lzmqc,'  ',lzmqe,'  ',":y) fappend zmqlogfile
+(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',lzmqc,'  ',lzmqe,'  ',":y) fappend logfile
 )
 
 NB. log for non zmq calls
 logx=: 4 : 0
-(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',":y) fappend zmqlogfile
+(LF,~(isotimestamp 6!:0''),'  ',(10{.x),'  ',(8":2!:6''),'  ',":y) fappend logfile
 )
 
-logread=: 3 : 'fread zmqlogfile'
+logread=: 3 : 'fread logfile'
 
 logclear=: 3 : 0
-ferase zmqlogfile
+ferase logfile
 i.0 0
 )
 
