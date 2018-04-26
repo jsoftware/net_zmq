@@ -10,7 +10,9 @@ Client/server examples and labs are in ~addons/net/jcs
 
 VERSION=: '1.0.10'
 
-RELEASE=: 'j806 j807'
+RELEASE=: 'j806'
+
+FOLDER=: 'net/zmq'
 
 FILES=: 0 : 0
 manifest.ijs
