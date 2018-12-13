@@ -49,7 +49,7 @@ ZMQ_POLLERR=: 4
 3 : 0''
 if. _1=nc<'ctx' do. ctx=: 0 [ sockets=: '' end.
 select. UNAME
-case. 'Linux' do. lib=: 'libzmq.so'
+case. 'Linux' do. lib=: 'libzmq.so.5'
 case. 'Win' do.
   lib=: fread'~home/zmqdllpath.txt'
   if. lib=_1 do.
