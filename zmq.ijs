@@ -40,7 +40,7 @@ ZMQ_DONTWAIT=: 1
 ZMQ_SNDMORE=: 2
 
 ZMQ_RCVMORE=: 13
-ZMQ_LINGER=:  17
+ZMQ_LINGER=: 17
 
 ZMQ_POLLIN=: 1
 ZMQ_POLLOUT=: 2
@@ -49,7 +49,16 @@ ZMQ_POLLERR=: 4
 3 : 0''
 if. _1=nc<'ctx' do. ctx=: 0 [ sockets=: '' end.
 select. UNAME
-case. 'Linux' do. lib=: IFRASPI {:: 'libzmq.so.5' ; 'libzmq.so.3'
+case. 'Linux' do.
+  if. ('libzmq.so.5 dummyfunction n')&cd :: (1={.@cder) '' do.
+    if. ('libzmq.so.4 dummyfunction n')&cd :: (1={.@cder) '' do.
+      lib=: 'libzmq.so.3'
+    else.
+      lib=: 'libzmq.so.4'
+    end.
+  else.
+    lib=: 'libzmq.so.5'
+  end.
 case. 'Win' do.
   lib=: fread'~home/zmqdllpath.txt'
   if. lib=_1 do.
@@ -80,8 +89,8 @@ lzmqe_jzmq_=: ''
 
 cdxnm=: 4 : 'r[check _1~:>{.r=. x cdx y'
 cdxnz=: 4 : 'r[check 0~: >{.r=. x cdx y'
-cdxz=:  4 : 'r[check 0=  >{.r=. x cdx y'
-cde=:   4 : '(lib,'' '',x)cd y'
+cdxz=: 4 : 'r[check 0=  >{.r=. x cdx y'
+cde=: 4 : '(lib,'' '',x)cd y'
 
 version=: 3 : 0
 try.
