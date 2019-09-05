@@ -3,6 +3,17 @@ NB. zmq covers and utils
 coclass'jzmq'
 
 0 : 0
+setlib runs once when script is first loaded
+to set lib_zmq_ as zmq shared library - for example,
+ '"C:/program files/zeromq 4.3.2/libzmq-v120-mt-4_3_2.dll"'
+or 
+ 'libzmq.so.5'
+ 
+if setlib can't find zmq or finds the wrong one, override with
+   lib_zmq=: '"..."' NB. set after load
+)
+
+0 : 0
 ctx_jzmq_ and sockets_jzmq_ maintained in zmq locale
 ctx created when first required
 
@@ -46,8 +57,7 @@ ZMQ_POLLIN=: 1
 ZMQ_POLLOUT=: 2
 ZMQ_POLLERR=: 4
 
-3 : 0''
-if. _1=nc<'ctx' do. ctx=: 0 [ sockets=: '' end.
+setlib=: 3 : 0
 select. UNAME
 case. 'Linux' do.
   if. ('libzmq.so.5 dummyfunction n')&cd :: (1={.@cder) '' do.
@@ -60,18 +70,27 @@ case. 'Linux' do.
     lib=: 'libzmq.so.5'
   end.
 case. 'Win' do.
-  lib=: fread'~home/zmqdllpath.txt'
-  if. lib=_1 do.
-    lib=: jpath'c:/program files/zeromq 4.0.4/bin/libzmq-v120-mt-4_0_4.dll'
+  p=. 'C:\program files\zeromq'
+  d=. 1 1 dir p,'*'
+  i=. ;100#.each".each (}:each(#p)}.each d) rplc each <'.';' '
+  i=. 1 i.~d i.>./i
+  'zmq not installed in "program files" folder' assert i<#d
+  p=. ,;i{d
+  b=. 1 1  dir    p,'libzmq*.dll'
+  if. 0=#b do.
+   b=. 1 1 dir w__=: p,'bin/libzmq-v120-mt-4*.dll'
   end.
-  m=. 'zmq shared library not at:',LF,'   ',lib,LF
-  m=. m,'verify zmq installed and if necessary set path in ~home/zmqdllpath.txt',LF,LF
-  m assert fexist lib
-  lib=: '"','"',~lib
+  ('zmq dll not found in ',;b) assert 1=#b
+  lib=: '"','"',~;b 
 case. 'Darwin' do.
   lib=: 'libzmq.dylib'
 case. do. 'platform not supported'assert 0
 end.
+)
+
+NB. first time initialization
+3 : 0''
+if. _1=nc<'ctx' do. setlib '' [ ctx=: 0 [ sockets=: '' end.
 )
 
 check=: 3 : 0
@@ -94,6 +113,10 @@ cde=: 4 : '(lib,'' '',x)cd y'
 
 version=: 3 : 0
 try.
+  if. IFWIN do. NB. load libsodium so it can found
+   t=. '"','"',~}.'/libsodium.dll',~lib{.~lib i: '/'
+   (t,' dummyfunction n')&cd :: (1={.@cder) ''
+  end.
   v=. }.;'zmq_version n *i *i *i'cdx (,1);(,2);,3
   ('zmq version (',(":v),') is too old')assert 4>:{.v
 catch.
