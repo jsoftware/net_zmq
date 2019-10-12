@@ -186,16 +186,21 @@ send=: 3 : 0
 r=. 'zmq_send > i x *c x i'cdxnm y
 )
 
-NB. timeout ; '' to for all events ; locales
+NB. timeout ; events ; tasks
+NB. events '' is for read+write events on all tasks
+NB. events are 1 for read, 2 for write, 3 for both tests for corresponding task
 NB. int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
 NB. returns readable;writeable;error
 NB. unix and windows pollitem structure differ
 NB.  unix fd is 32 bits and windows SOCKET is 64 bits
 NB.  unix structure is 16 bytes windows structure is 24 (rounded up)
 NB. result is return_code;reads;writes;errors
+NB. e is 1 for read test, 2 for write test, and 3 for both
 poll=: 3 : 0
 't e s'=. y
-'events must be empty string'assert ''-:e
+if. e-:'' do. e=. 3#~#s end.
+'count events must equal count tasks'assert (#e)=#s
+'events must be 1 (read), 2 (write), or 3 (both)'assert 0=#e-. 1 2 3
 size=. IFWIN{16 24
 off=. IFWIN{ 0 4
 b=. size*#s
@@ -204,7 +209,7 @@ a=. mema b
 for_i. i.#s do.
   c=. i{s
   S__c memw (a+i*size),0,1,4
-  (7{a.)memw (12+off+a+i*size),0,1
+  (a.{~i{e) memw (12+off+a+i*size),0,1
 end.
 q=. 'zmq_poll > i * i x'cdxnm (<a);(#s);t
 r=. a.i.(14+off){"1 (size,~#s)$memr a,0,b
