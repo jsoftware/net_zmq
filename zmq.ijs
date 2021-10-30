@@ -59,7 +59,7 @@ ZMQ_POLLERR=: 4
 
 setlib=: 3 : 0
 select. UNAME
-case. 'Linux' do.
+case. 'Linux';'OpenBSD' do.
   if. ('libzmq.so.5 dummyfunction n')&cd :: (1={.@cder) '' do.
     if. ('libzmq.so.4 dummyfunction n')&cd :: (1={.@cder) '' do.
       lib=: 'libzmq.so.3'
