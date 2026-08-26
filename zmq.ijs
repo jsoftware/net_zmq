@@ -83,7 +83,7 @@ case. 'Win' do.
   ('zmq dll not found in ',;b) assert 1=#b
   lib=: '"','"',~;b 
 case. 'Darwin' do.
-  lib=: 'libzmq.dylib'
+  lib=: ('arm64'-:9!:56'cpu'){::'libzmq.dylib';'/opt/homebrew/lib/libzmq.dylib'
 case. do. 'platform not supported'assert 0
 end.
 )
